@@ -1,13 +1,15 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+	"github.com/khusainnov/rest-api/internal/user"
+)
 
 type Authorization interface {
-
+	CreateUser(u user.User) (int, error)
 }
 
 type PostList interface {
-
 }
 
 type Repository struct {
@@ -16,6 +18,7 @@ type Repository struct {
 }
 
 func NewService(db *sqlx.DB) *Repository {
-	return &Repository{}
+	return &Repository{
+		Authorization: NewAuthPostgres(db),
+	}
 }
-

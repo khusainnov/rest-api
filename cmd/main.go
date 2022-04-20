@@ -7,30 +7,31 @@ import (
 	"github.com/khusainnov/rest-api/package/repository"
 	"github.com/khusainnov/rest-api/package/service"
 	_ "github.com/lib/pq"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"log"
 	"os"
 )
 
 func main() {
+	logrus.SetFormatter(new(logrus.JSONFormatter))
 	if err := initConfig(); err != nil {
-		log.Fatalf("Cannot read config due to error: %s", err.Error())
+		logrus.Fatalf("Cannot read config due to error: %s", err.Error())
 	}
 
-	if err := godotenv.Load(".env"); err != nil{
-		log.Fatalf("Cannot load env variables due to error: %s", err.Error())
+	if err := godotenv.Load(".env"); err != nil {
+		logrus.Fatalf("Cannot load env variables due to error: %s", err.Error())
 	}
 
 	db, err := repository.NewPostgresDB(repository.Config{
-		Host: viper.GetString("db.host"),
-		Port: viper.GetString("db.port"),
+		Host:     viper.GetString("db.host"),
+		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
 		Password: os.Getenv("DB_PASSWORD"),
-		DBName: viper.GetString("db.dbname"),
-		SSLMode: viper.GetString("db.sslmode"),
+		DBName:   viper.GetString("db.dbname"),
+		SSLMode:  viper.GetString("db.sslmode"),
 	})
 	if err != nil {
-		log.Fatalf("Cannot connect to DB due to error: %s", err.Error())
+		logrus.Fatalf("Cannot connect to DB due to error: %s", err.Error())
 	}
 
 	repos := repository.NewService(db)
@@ -40,7 +41,7 @@ func main() {
 	s := restapi.Server{}
 
 	if err = s.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		log.Fatalf("Cannot run the server due to error: %s", err.Error())
+		logrus.Fatalf("Cannot run the server due to error: %s", err.Error())
 	}
 }
 

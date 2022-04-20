@@ -1,13 +1,15 @@
 package service
 
-import "github.com/khusainnov/rest-api/package/repository"
+import (
+	"github.com/khusainnov/rest-api/internal/user"
+	"github.com/khusainnov/rest-api/package/repository"
+)
 
 type Authorization interface {
-
+	CreateUser(user user.User) (int, error)
 }
 
 type PostList interface {
-
 }
 
 type Service struct {
@@ -16,5 +18,7 @@ type Service struct {
 }
 
 func NewService(repos *repository.Repository) *Service {
-	return &Service{}
+	return &Service{
+		Authorization: NewAuthService(repos),
+	}
 }
